@@ -8,3 +8,9 @@ householder2_r = function(x){
   u = u/l2norm(u)
   householder_r(x, u)
 }
+householder3_r = function(x){
+  l2norm = function(x) sqrt(sum(x^2))
+  u = x - l2norm(x)*c(1,rep(0,length(x)-1))
+  u = u/l2norm(u)
+  u
+}

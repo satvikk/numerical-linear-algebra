@@ -36,7 +36,7 @@ names(mbc_df2) = c("n",'base','r','cpp','base_adj','r_adj','cpp_adj')
 set.seed(4)
 mat = matrix(rnorm(50000), ncol = 100, nrow = 500)
 myqr = qr(mat)
-norm(mat - (qr.Q(myqr) %*% qr.R(myqr)), "F")
+norm(mat - (qr.Q(myqr, complet) %*% qr.R(myqr, complete = T)), "F")
 
 #qr_decomposition_r ----
 source("qr_r.R")
@@ -44,3 +44,25 @@ set.seed(4)
 mat = matrix(rnorm(50000), ncol = 100, nrow = 500)
 myqr = qr_r(mat)
 norm(mat - (myqr$q %*% myqr$r), "F")
+
+#qr_decomposition_cpp ----
+sourceCpp("qr_cpp.cpp")
+set.seed(4)
+mat = matrix(rnorm(10000), ncol = 100, nrow = 100)
+myqr = qr_cpp(mat)
+norm(mat - (myqr$q %*% myqr$r), "F")
+
+
+#microbenchmarking qr ----
+set.seed(42)
+mbc = list()
+nns = c(14:21)*10
+ns = lapply(nns, function(z) matrix(rnorm(z^2), nrow = z) %>% (function(zz) zz %*% t(zz)))
+for(i in 1:length(ns)){
+  print(i)
+  mat3 = ns[[i]]
+  mbc[[i]] = microbenchmark(qr(mat3), qr_r(mat3)) %>% summary
+}
+mbc_df = sapply(mbc, `[[`, "median") %>% t %>% cbind(nns,.) %>% as.data.frame %>% `names<-`(c("n", "base", "r"))
+mbc_df2 = cbind(mbc_df, sapply(mbc_df[,-1], function(z) z/(mbc_df$n^2)))
+names(mbc_df2) = c("n",'base','r','base_adj','r_adj')

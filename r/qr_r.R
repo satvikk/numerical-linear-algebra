@@ -1,15 +1,13 @@
 source("householder_r.R")
 qr_r = function(A){
-  q = diag(1,nrow = m, ncol = m)
   n = ncol(A)
   m = nrow(A)
-  for(i in 1:(n)){
-    q2 = diag(1, nrow = m)
-    q2[i:m,i:m] = householder2_r(A[i:m,i])$P
-    A = q2 %*% A
-    q = q2 %*% q
+  q = diag(1,nrow = m, ncol = m)
+  for(i in 1:n){
+    u = householder3_r(A[i:m,i])
+    A[i:m,i:m] = A[i:m,i:m] - 2 * matrix(u) %*% (t(matrix(u)) %*% A[i:m,i:m])
+    q[i:m,] = q[i:m,] - 2 * matrix(u) %*% (t(matrix(u)) %*% q[i:m,])
   }
   A[lower.tri(A)] = 0
   return(list(q = t(q), r = A))
 }
-
