@@ -10,13 +10,11 @@ List qr_cpp(NumericMatrix input){
   int m = A.nrow();
   NumericMatrix q(m);
   q.fill_diag(1);
-  List tuqs;
-  List tuas;
   
   for(int i = 0; i < n; i++){
     NumericVector u = householder3_cpp(A.import(A.begin() + m*i + i, A.begin() + m*i + m));
     NumericVector tua(n - i);
-    NumericVector tuq(n);
+    NumericVector tuq(m);
     
     for(int j = 0; j < i; j++){
       for(int k = i; k < m; k++){
@@ -27,6 +25,11 @@ List qr_cpp(NumericMatrix input){
       for(int k = i; k < m; k++){
         tuq[j] = tuq[j] + u[k - i]*q(k,j);
         tua[j - i] = tua[j - i] + u[k - i]*A(k,j);
+      }
+    }
+    for(int j = n; j < m; j++){
+      for(int k = i; k < m; k++){
+        tuq[j] = tuq[j] + u[k - i]*q(k,j);
       }
     }
     
@@ -42,9 +45,12 @@ List qr_cpp(NumericMatrix input){
         A(k,j) = A(k,j) - 2*u[k - i]*tua[j - i];
       }
     }
-    tuqs.push_back(tuq);
-    tuas.push_back(tua);
+    for(int j = n; j < m; j++){
+      for(int k = i; k < m; k++){
+        q(k,j) = q(k,j) - 2*u[k - i]*tuq[j];
+      }
+    }
   }
-  return List::create(Named("q") = transpose(q), Named("r") = A, Named("tuas") = tuas, Named("tuqs") = tuqs);
+  return List::create(Named("q") = transpose(q), Named("r") = A);
 }
 
