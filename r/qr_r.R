@@ -5,7 +5,7 @@ qr_r = function(A){
   q = diag(1,nrow = m, ncol = m)
   for(i in 1:n){
     u = householder3_r(A[i:m,i])
-    A[i:m,i:m] = A[i:m,i:m] - 2 * matrix(u) %*% (t(matrix(u)) %*% A[i:m,i:m])
+    A[i:m,i:n] = A[i:m,i:n] - 2 * matrix(u) %*% (t(matrix(u)) %*% A[i:m,i:n])
     q[i:m,] = q[i:m,] - 2 * matrix(u) %*% (t(matrix(u)) %*% q[i:m,])
   }
   A[lower.tri(A)] = 0

@@ -4,26 +4,47 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-List qr_cpp(NumericMatrix A){
+List qr_cpp(NumericMatrix input){
+  NumericMatrix A = clone(input);
   int n = A.ncol();
   int m = A.nrow();
   NumericMatrix q(m);
   q.fill_diag(1);
+  List tuqs;
+  List tuas;
   
   for(int i = 0; i < n; i++){
-    NumericMatrix q2(m);
-    q2.fill_diag(1);
-    q2(Range(i,m), Range(i,m));
-    NumericMatrix hh = householder2_cpp(A.import(A.begin() + i*m + i, A.begin() + i*m + m));
-    for(int j1 = i; j1 < m; j1 ++){
-      for(int j2 = i; j2 < m; j2++){
-        q2(j1,j2) = hh(j1 - i, j2 - i);
+    NumericVector u = householder3_cpp(A.import(A.begin() + m*i + i, A.begin() + m*i + m));
+    NumericVector tua(n - i);
+    NumericVector tuq(n);
+    
+    for(int j = 0; j < i; j++){
+      for(int k = i; k < m; k++){
+        tuq[j] = tuq[j] + u[k - i]*q(k,j);
       }
     }
-    //std::cout << "q2:" <<q2.nrow() << "x" << q2.ncol() << " A:" << A.ncol() << "x" << A.nrow() << " q:" << q.ncol() << "x" << q.nrow() << std::endl;
-    A = matmul(q2,A);
-    q = matmul(q2,q);
+    for(int j = i; j < n; j++){
+      for(int k = i; k < m; k++){
+        tuq[j] = tuq[j] + u[k - i]*q(k,j);
+        tua[j - i] = tua[j - i] + u[k - i]*A(k,j);
+      }
+    }
+    
+    
+    for(int j = 0; j < i; j++){
+      for(int k = i; k < m; k++){
+        q(k,j) = q(k,j) - 2*u[k - i]*tuq[j];
+      }
+    }
+    for(int j = i; j < n; j++){
+      for(int k = i; k < m; k++){
+        q(k,j) = q(k,j) - 2*u[k - i]*tuq[j ];
+        A(k,j) = A(k,j) - 2*u[k - i]*tua[j - i];
+      }
+    }
+    tuqs.push_back(tuq);
+    tuas.push_back(tua);
   }
-  return List::create(Named("q") = transpose(q) , Named("r") = A);
+  return List::create(Named("q") = transpose(q), Named("r") = A, Named("tuas") = tuas, Named("tuqs") = tuqs);
 }
 

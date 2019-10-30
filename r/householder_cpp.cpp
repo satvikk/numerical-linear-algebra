@@ -20,3 +20,10 @@ NumericMatrix householder2_cpp(NumericVector x){
   u[0] = u[0] - l2norm(x); 
   return householder_cpp(x, u/l2norm(u));
 }
+
+// [[Rcpp::export]]
+NumericVector householder3_cpp(NumericVector x){
+  NumericVector u = x;
+  u[0] = u[0] - l2norm(x); 
+  return u/l2norm(u);
+}

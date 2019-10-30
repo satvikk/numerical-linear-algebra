@@ -41,7 +41,7 @@ norm(mat - (qr.Q(myqr, complet) %*% qr.R(myqr, complete = T)), "F")
 #qr_decomposition_r ----
 source("qr_r.R")
 set.seed(4)
-mat = matrix(rnorm(50000), ncol = 100, nrow = 500)
+mat = matrix(rnorm(250000), nc1ol = 500, nrow = 500)
 myqr = qr_r(mat)
 norm(mat - (myqr$q %*% myqr$r), "F")
 
@@ -56,7 +56,7 @@ norm(mat - (myqr$q %*% myqr$r), "F")
 #microbenchmarking qr ----
 set.seed(42)
 mbc = list()
-nns = c(14:21)*10
+nns = c(2:18)*10
 ns = lapply(nns, function(z) matrix(rnorm(z^2), nrow = z) %>% (function(zz) zz %*% t(zz)))
 for(i in 1:length(ns)){
   print(i)
