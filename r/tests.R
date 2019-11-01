@@ -45,9 +45,8 @@ norm(mat - (myqr$q %*% myqr$r), "F")
 
 #qr_decomposition_cpp ----
 sourceCpp("qr_cpp.cpp")
-myqr = qr_cpp(mat)
+`myqr = qr_cpp(mat)
 norm(mat - (myqr$q %*% myqr$r), "F")
-
 
 #microbenchmarking qr ----
 set.seed(42)
