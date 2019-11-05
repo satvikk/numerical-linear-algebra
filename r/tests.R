@@ -45,7 +45,7 @@ norm(mat - (myqr$q %*% myqr$r), "F")
 
 #qr_decomposition_cpp ----
 sourceCpp("qr_cpp.cpp")
-`myqr = qr_cpp(mat)
+myqr = qr_cpp(mat)
 norm(mat - (myqr$q %*% myqr$r), "F")
 
 #microbenchmarking qr ----
@@ -61,3 +61,9 @@ for(i in 1:length(ns)){
 mbc_df = sapply(mbc, `[[`, "median") %>% t %>% cbind(nns,.) %>% as.data.frame %>% `names<-`(c("n", "base", "r", "cpp"))
 mbc_df2 = cbind(mbc_df, sapply(mbc_df[,-1], function(z) z/(mbc_df$n^2)))
 names(mbc_df2) = c("n",'base','r','cpp','base_adj','r_adj','cpp_adj')
+
+#lm_cpp ----
+sourceCpp("lm_cpp.cpp")
+mat = matrix(rnorm(50*1000), ncol = 50)
+y = rnorm(1000)
+mylm = lm_cpp(x = mat, y = y)

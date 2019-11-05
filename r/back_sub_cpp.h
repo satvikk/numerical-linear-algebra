@@ -3,4 +3,5 @@
 #define BACK_SUB_H
 
 Rcpp::NumericMatrix back_sub_cpp(Rcpp::NumericMatrix, Rcpp::NumericMatrix);
+Rcpp::NumericMatrix forw_sub_cpp(Rcpp::NumericMatrix, Rcpp::NumericMatrix);
 #endif
